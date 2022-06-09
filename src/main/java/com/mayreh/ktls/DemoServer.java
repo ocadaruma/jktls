@@ -178,29 +178,31 @@ public class DemoServer {
                 loremIpsum.read(connection.appData);
             } else {
                 connection.appData.put(message.getBytes(StandardCharsets.UTF_8));
+                connection.appData.flip();
+                connection.channel.write(connection.appData);
             }
-            connection.appData.flip();
-            while (connection.appData.hasRemaining()) {
-                connection.netData.clear();
-                SSLEngineResult engineResult = connection.engine.wrap(connection.appData, connection.netData);
-                switch (engineResult.getStatus()) {
-                    case BUFFER_OVERFLOW:
-                        connection.netData = grow(connection.netData,
-                                                  connection.engine.getSession().getPacketBufferSize());
-                        break;
-                    case BUFFER_UNDERFLOW:
-                        throw new IllegalStateException("Should not happen");
-                    case CLOSED:
-                        log.warn("Closed");
-                        break;
-                    case OK:
-                        connection.netData.flip();
-                        while (connection.netData.hasRemaining()) {
-                            connection.channel.write(connection.netData);
-                        }
-                        break;
-                }
-            }
+//            connection.appData.flip();
+//            while (connection.appData.hasRemaining()) {
+//                connection.netData.clear();
+//                SSLEngineResult engineResult = connection.engine.wrap(connection.appData, connection.netData);
+//                switch (engineResult.getStatus()) {
+//                    case BUFFER_OVERFLOW:
+//                        connection.netData = grow(connection.netData,
+//                                                  connection.engine.getSession().getPacketBufferSize());
+//                        break;
+//                    case BUFFER_UNDERFLOW:
+//                        throw new IllegalStateException("Should not happen");
+//                    case CLOSED:
+//                        log.warn("Closed");
+//                        break;
+//                    case OK:
+//                        connection.netData.flip();
+//                        while (connection.netData.hasRemaining()) {
+//                            connection.channel.write(connection.netData);
+//                        }
+//                        break;
+//                }
+//            }
         }
     }
 

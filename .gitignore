@@ -1,0 +1,11 @@
+.idea/
+.DS_Store
+*~
+
+build
+out
+.gradle
+gen/
+libs/*
+
+!.gitkeep

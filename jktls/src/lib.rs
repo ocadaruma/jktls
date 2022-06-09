@@ -102,7 +102,7 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
     in_fd: jint,
     position: jlong,
     count: jlong) -> jlong {
-    sendfile(in_fd, out_fd, None, count as usize).expect("failed to sendfile") as jlong
+    sendfile(out_fd, in_fd, None, count as usize).expect("failed to sendfile") as jlong
 }
 
 #[cfg(test)]

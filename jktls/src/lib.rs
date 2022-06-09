@@ -9,18 +9,20 @@ use nix::NixPath;
 use nix::sys::socket::SockaddrLike;
 
 #[repr(C)]
+#[derive(Debug)]
 struct TlsCryptoInfo {
     version: u16,
     cipher_type: u16,
 }
 
 #[repr(C)]
+#[derive(Debug)]
 struct Tls12CryptoInfoAesGcm128 {
     info: TlsCryptoInfo,
-    iv: [u8; 8],
-    key: [u8; 16],
-    salt: [u8; 4],
-    rec_seq: [u8; 8],
+    iv: [i8; 8],
+    key: [i8; 16],
+    salt: [i8; 4],
+    rec_seq: [i8; 8],
 }
 
 #[no_mangle]
@@ -60,14 +62,16 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTlsTxTls12AesGcm
     let crypt_info = unsafe {
         Tls12CryptoInfoAesGcm128 {
             info,
-            iv: transmute(*(iv.as_ptr() as *const [u8; 8])),
-            key: transmute(*(key.as_ptr() as *const [u8; 16])),
-            salt: transmute(*(salt.as_ptr() as *const [u8; 4])),
-            rec_seq: transmute(*(rec_seq.as_ptr() as *const [u8; 8])),
-        };
+            iv: transmute(*(iv.as_ptr() as *const [i8; 8])),
+            key: transmute(*(key.as_ptr() as *const [i8; 16])),
+            salt: transmute(*(salt.as_ptr() as *const [i8; 4])),
+            rec_seq: transmute(*(rec_seq.as_ptr() as *const [i8; 8])),
+        }
     };
+
+    println!("crypt info: version: {:?}", &crypt_info);
     let ret = unsafe {
-        setsockopt(fd, 282, 1, crypt_info.as_ptr() as *const c_void, size_of::<Tls12CryptoInfoAesGcm128>() as u32)
+        setsockopt(fd, 282, 1, transmute((&crypt_info) as *const Tls12CryptoInfoAesGcm128), size_of::<Tls12CryptoInfoAesGcm128>() as u32)
     };
     if ret != 0 {
         env.throw(format!("Failed to setsockopt fot tls. returned: {}, errno: {}", ret, errno()));

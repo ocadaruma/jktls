@@ -1,10 +1,12 @@
 use std::ffi::CString;
+use std::mem::{size_of, transmute};
 use jni::JNIEnv;
-use jni::objects::{JClass, JString};
+use jni::objects::{JClass, JString, ReleaseMode};
 use jni::sys::{jbyteArray, jint, jstring};
 use nix::errno::errno;
 use nix::libc::{c_void, setsockopt, SOL_SOCKET};
 use nix::NixPath;
+use nix::sys::socket::SockaddrLike;
 
 #[repr(C)]
 struct TlsCryptoInfo {
@@ -46,6 +48,30 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTlsTxTls12AesGcm
     key: jbyteArray,
     salt: jbyteArray,
     rec_seq: jbyteArray) {
+    let iv = env.get_byte_array_elements(iv, ReleaseMode::NoCopyBack).expect("Failed to get iv");
+    let key = env.get_byte_array_elements(key, ReleaseMode::NoCopyBack).expect("Failed to get key");
+    let salt = env.get_byte_array_elements(salt, ReleaseMode::NoCopyBack).expect("Failed to get salt");
+    let rec_seq = env.get_byte_array_elements(rec_seq, ReleaseMode::NoCopyBack).expect("Failed to get rec_seq");
+
+    let info = TlsCryptoInfo {
+        version: 0x0303,
+        cipher_type: 51,
+    };
+    let crypt_info = unsafe {
+        Tls12CryptoInfoAesGcm128 {
+            info,
+            iv: transmute(*(iv.as_ptr() as *const [u8; 8])),
+            key: transmute(*(key.as_ptr() as *const [u8; 16])),
+            salt: transmute(*(salt.as_ptr() as *const [u8; 4])),
+            rec_seq: transmute(*(rec_seq.as_ptr() as *const [u8; 8])),
+        };
+    };
+    let ret = unsafe {
+        setsockopt(fd, 282, 1, crypt_info.as_ptr() as *const c_void, size_of::<Tls12CryptoInfoAesGcm128>() as u32)
+    };
+    if ret != 0 {
+        env.throw(format!("Failed to setsockopt fot tls. returned: {}, errno: {}", ret, errno()));
+    }
 }
 
 #[cfg(test)]

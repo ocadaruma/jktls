@@ -79,6 +79,7 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTlsTxTls12AesGcm
     }
 }
 
+#[cfg(any(target_os = "ios", target_os = "macos"))]
 #[no_mangle]
 pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
     env: JNIEnv,
@@ -90,6 +91,18 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
     let (res, len) = sendfile(in_fd, out_fd, position, Some(count), None, None);
     res.expect("failed to sendfile");
     len
+}
+
+#[cfg(any(target_os = "android", target_os = "linux"))]
+#[no_mangle]
+pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
+    env: JNIEnv,
+    class: JClass,
+    out_fd: jint,
+    in_fd: jint,
+    position: jlong,
+    count: jlong) -> jlong {
+    sendfile(in_fd, out_fd, None, count as usize).expect("failed to sendfile") as jlong
 }
 
 #[cfg(test)]

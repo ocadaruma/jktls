@@ -1,6 +1,7 @@
 package com.mayreh.ktls;
 
 import java.nio.channels.ByteChannel;
+import java.nio.channels.FileChannel;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.NetworkChannel;
 import java.nio.channels.ScatteringByteChannel;
@@ -15,4 +16,6 @@ public interface KTlsSocketChannel extends ByteChannel,
     static KTlsSocketChannel wrap(SocketChannel channel) {
         return new KTlsSocketChannelImpl(channel);
     }
+
+    long transferFrom(FileChannel channel, long position, long count);
 }

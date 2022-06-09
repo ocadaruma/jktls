@@ -2,10 +2,11 @@ use std::ffi::CString;
 use std::mem::{size_of, transmute};
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, ReleaseMode};
-use jni::sys::{jbyteArray, jint, jstring};
+use jni::sys::{jbyteArray, jint, jlong, jstring};
 use nix::errno::errno;
 use nix::libc::{c_void, setsockopt, SOL_SOCKET};
 use nix::NixPath;
+use nix::sys::sendfile::sendfile;
 use nix::sys::socket::SockaddrLike;
 
 #[repr(C)]
@@ -19,10 +20,10 @@ struct TlsCryptoInfo {
 #[derive(Debug)]
 struct Tls12CryptoInfoAesGcm128 {
     info: TlsCryptoInfo,
-    iv: [i8; 8],
-    key: [i8; 16],
-    salt: [i8; 4],
-    rec_seq: [i8; 8],
+    iv: [u8; 8],
+    key: [u8; 16],
+    salt: [u8; 4],
+    rec_seq: [u8; 8],
 }
 
 #[no_mangle]
@@ -76,6 +77,19 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTlsTxTls12AesGcm
     if ret != 0 {
         env.throw(format!("Failed to setsockopt fot tls. returned: {}, errno: {}", ret, errno()));
     }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
+    env: JNIEnv,
+    class: JClass,
+    out_fd: jint,
+    in_fd: jint,
+    position: jlong,
+    count: jlong) -> jlong {
+    let (res, len) = sendfile(in_fd, out_fd, position, Some(count), None, None);
+    res.expect("failed to sendfile");
+    len
 }
 
 #[cfg(test)]

@@ -175,7 +175,7 @@ public class DemoServer {
             if ("lorem-ipsum.txt".equals(message.trim())) {
                 log.info("Received lorem-ipsum");
                 loremIpsum.position(0);
-                loremIpsum.transferTo(0, loremIpsum.size(), connection.channel);
+                connection.channel.transferFrom(loremIpsum, 0, loremIpsum.size());
             } else {
                 connection.appData.put(message.getBytes(StandardCharsets.UTF_8));
                 connection.appData.flip();

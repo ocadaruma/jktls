@@ -30,7 +30,7 @@ public class KTlsSocketChannel implements ByteChannel,
     private static native long sendFile(int outFd, int inFd, long position, long count);
 
     static {
-        System.loadLibrary("jktls");
+        System.load(System.getenv("JKTLS_LIB_PATH"));
     }
 
     private final SocketChannel delegate;

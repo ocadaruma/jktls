@@ -95,7 +95,7 @@ pub extern "system" fn Java_com_mayreh_ktls_KTlsSocketChannel_sendFile(
 
 #[cfg(any(target_os = "android", target_os = "linux"))]
 #[no_mangle]
-pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile(
+pub extern "system" fn Java_com_mayreh_ktls_KTlsSocketChannel_sendFile(
     env: JNIEnv,
     class: JClass,
     out_fd: jint,

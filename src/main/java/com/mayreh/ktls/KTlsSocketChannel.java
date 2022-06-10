@@ -24,14 +24,14 @@ public class KTlsSocketChannel implements ByteChannel,
                                           ScatteringByteChannel,
                                           GatheringByteChannel,
                                           NetworkChannel {
+    static {
+        System.loadLibrary("jktls");
+    }
+
     private static native void setTcpUlp(int fd, String name);
     private static native void setTlsTx_Tls12_Aes_Gcm128(
             int fd, byte[] iv, byte[] key, byte[] salt, byte[] recSeq);
     private static native long sendFile(int outFd, int inFd, long position, long count);
-
-    static {
-        System.load(System.getenv("JKTLS_LIB_PATH"));
-    }
 
     private final SocketChannel delegate;
     private final SocketChannelImpl impl;

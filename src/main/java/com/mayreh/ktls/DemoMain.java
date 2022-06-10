@@ -12,20 +12,20 @@ import net.bytebuddy.pool.TypePool.Default;
 
 public class DemoMain {
     public static void main(String[] args) throws Exception {
-        TypePool typePool = Default.ofSystemLoader();
-        Map<TypeDescription, byte[]> types = new HashMap<>();
-        types.put(typePool.describe("sun.security.ssl.TlsCryptoInfo").resolve(),
-                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("sun.security.ssl.TlsCryptoInfo").resolve());
-        types.put(typePool.describe("com.mayreh.ktls.KTlsSocketChannel").resolve(),
-                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("com.mayreh.ktls.KTlsSocketChannel").resolve());
-        types.put(typePool.describe("com.mayreh.ktls.KTlsSocketOptions").resolve(),
-                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("com.mayreh.ktls.KTlsSocketOptions").resolve());
-        types.put(typePool.describe("com.mayreh.ktls.KTlsSocketOptions$SockOption").resolve(),
-                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("com.mayreh.ktls.KTlsSocketOptions$SockOption").resolve());
-        types.put(typePool.describe("sun.nio.ch.KTlsSocketChannelImpl").resolve(),
-                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("sun.nio.ch.KTlsSocketChannelImpl").resolve());
-        ClassInjector.UsingUnsafe.ofBootLoader()
-                                 .inject(types);
+//        TypePool typePool = Default.ofSystemLoader();
+//        Map<TypeDescription, byte[]> types = new HashMap<>();
+//        types.put(typePool.describe("sun.security.ssl.TlsCryptoInfo").resolve(),
+//                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("sun.security.ssl.TlsCryptoInfo").resolve());
+//        types.put(typePool.describe("com.mayreh.ktls.KTlsSocketChannel").resolve(),
+//                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("com.mayreh.ktls.KTlsSocketChannel").resolve());
+//        types.put(typePool.describe("com.mayreh.ktls.KTlsSocketOptions").resolve(),
+//                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("com.mayreh.ktls.KTlsSocketOptions").resolve());
+//        types.put(typePool.describe("com.mayreh.ktls.KTlsSocketOptions$SockOption").resolve(),
+//                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("com.mayreh.ktls.KTlsSocketOptions$SockOption").resolve());
+//        types.put(typePool.describe("sun.nio.ch.KTlsSocketChannelImpl").resolve(),
+//                  ClassFileLocator.ForClassLoader.ofSystemLoader().locate("sun.nio.ch.KTlsSocketChannelImpl").resolve());
+//        ClassInjector.UsingUnsafe.ofBootLoader()
+//                                 .inject(types);
 
         SocketChannel ch = SocketChannel.open();
 

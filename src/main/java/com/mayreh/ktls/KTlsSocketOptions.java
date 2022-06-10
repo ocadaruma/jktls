@@ -4,7 +4,6 @@ import java.net.SocketOption;
 
 import lombok.Value;
 import lombok.experimental.Accessors;
-import sun.security.ssl.TlsCryptoInfo;
 
 public final class KTlsSocketOptions {
     private KTlsSocketOptions() {}

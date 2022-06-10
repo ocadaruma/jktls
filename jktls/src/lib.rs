@@ -27,7 +27,7 @@ struct Tls12CryptoInfoAesGcm128 {
 }
 
 #[no_mangle]
-pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTcpUlp(
+pub extern "system" fn Java_com_mayreh_ktls_KTlsSocketChannel_setTcpUlp(
     env: JNIEnv,
     class: JClass,
     fd: jint,
@@ -43,7 +43,7 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTcpUlp(
 }
 
 #[no_mangle]
-pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTlsTxTls12AesGcm128(
+pub extern "system" fn Java_com_mayreh_ktls_KTlsSocketChannel_setTlsTx_1Tls12_1Aes_1Gcm128(
     env: JNIEnv,
     class: JClass,
     fd: jint,
@@ -81,7 +81,7 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_setTlsTxTls12AesGcm
 
 #[cfg(any(target_os = "ios", target_os = "macos"))]
 #[no_mangle]
-pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
+pub extern "system" fn Java_com_mayreh_ktls_KTlsSocketChannel_sendFile(
     env: JNIEnv,
     class: JClass,
     out_fd: jint,
@@ -95,7 +95,7 @@ pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
 
 #[cfg(any(target_os = "android", target_os = "linux"))]
 #[no_mangle]
-pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile0(
+pub extern "system" fn Java_sun_nio_ch_KTlsSocketChannelImpl_sendFile(
     env: JNIEnv,
     class: JClass,
     out_fd: jint,

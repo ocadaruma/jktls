@@ -1,7 +1,6 @@
 package com.mayreh.ktls;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -33,7 +32,6 @@ import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import sun.security.ssl.TlsCryptoInfo;
 
 /**
  * A SSL server that returns:

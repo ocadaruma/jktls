@@ -19,6 +19,6 @@ public class Authenticator {
     private final Object obj;
 
     public byte[] sequenceNumber() {
-        return doReflection(() -> (byte[]) sequenceNumber.invoke(this));
+        return doReflection(() -> (byte[]) sequenceNumber.invoke(obj));
     }
 }

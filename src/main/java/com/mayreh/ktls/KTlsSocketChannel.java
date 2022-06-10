@@ -29,6 +29,10 @@ public class KTlsSocketChannel implements ByteChannel,
             int fd, byte[] iv, byte[] key, byte[] salt, byte[] recSeq);
     private static native long sendFile(int outFd, int inFd, long position, long count);
 
+    static {
+        System.loadLibrary("jktls");
+    }
+
     private final SocketChannel delegate;
     private final SocketChannelImpl impl;
 

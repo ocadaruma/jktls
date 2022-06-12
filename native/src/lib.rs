@@ -187,7 +187,7 @@ fn set_tls_tx(
         } => {
             let v = Tls12AesGcm128::new(info, iv, key, salt, rec_seq)?;
             (
-                &v as *const Tls12AesGcm128 as *const c_void,
+                (&v as *const Tls12AesGcm128) as *const c_void,
                 size_of::<Tls12AesGcm128>() as u32,
             )
         }

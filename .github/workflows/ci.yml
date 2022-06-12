@@ -51,14 +51,14 @@ jobs:
       with:
         java-version: 1.8
     - name: Build native lib
-      working-directory: ./core
+      working-directory: ./jktls
       run: ../gradlew copyNativeLib
     - name: Save native lib output
       if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v2
       with:
         name: native-libs
-        path: core/build/native/*
+        path: jktls/build/native/*
   publish:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [build, test, native-test]
@@ -73,13 +73,13 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: native-libs
-        path: core/build/native
+        path: jktls/build/native
     - id: get-tag-version
       run: |
         version=$(echo ${{github.ref}} | cut -f3 -d/ | sed 's/^v//')
         echo "::set-output name=version::$version"
     - name: Build universal jar
-      working-directory: ./core
+      working-directory: ./jktls
       run: ../gradlew -Pversion=${{ steps.get-tag-version.outputs.version }} -Psnapshot=false universalJar
     - name: Create release
       id: create_release
@@ -95,6 +95,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: core/build/libs/core-${{ steps.get-tag-version.outputs.version }}-universal.jar
+        asset_path: jktls/build/libs/jktls-${{ steps.get-tag-version.outputs.version }}-universal.jar
         asset_name: jktls-${{ steps.get-tag-version.outputs.version }}-universal.jar
         asset_content_type: application/octet-stream

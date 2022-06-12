@@ -18,7 +18,14 @@ static def targetOs() {
 }
 
 static def targetArch() {
-    return System.getProperty("os.arch")
+    def arch = System.getProperty("os.arch").toLowerCase()
+    if (arch.contains("x86_64") || arch.contains("amd64")) {
+        return "x86_64"
+    }
+    if (arch.contains("aarch64") || arch.contains("arm64")) {
+        return "aarch64"
+    }
+    throw new RuntimeException("architecture not supported: " + System.getProperty("os.arch"))
 }
 
 task buildNativeLib(type: Exec) {

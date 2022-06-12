@@ -52,7 +52,14 @@ class NativeLoader {
     }
 
     private static String arch() {
-        return System.getProperty("os.arch");
+        String arch = System.getProperty("os.arch").toLowerCase();
+        if (arch.contains("x86_64") || arch.contains("amd64")) {
+            return "x86_64";
+        }
+        if (arch.contains("aarch64") || arch.contains("arm64")) {
+            return "aarch64";
+        }
+        throw new RuntimeException("architecture not supported: " + System.getProperty("os.arch"));
     }
 
     private static class TemporaryFile implements AutoCloseable {

@@ -1,1 +1,41 @@
 apply plugin: "java-library"
+
+static def targetOs() {
+    def os = System.getProperty("os.name").toLowerCase()
+    if (os.contains("linux")) {
+        return "linux"
+    }
+    if (os.contains("mac os") || os.contains("darwin")) {
+        return "macos"
+    }
+    throw new RuntimeException("platform not supported: " + System.getProperty("os.name"))
+}
+
+static def targetArch() {
+    return System.getProperty("os.arch")
+}
+
+task buildNativeLib(type: Exec) {
+    workingDir "../native"
+    def args = ["cargo", "build", "--release"]
+    commandLine args
+}
+
+task copyNativeLib(type: Copy) {
+    dependsOn "buildNativeLib"
+    from "../native/target/release"
+    include "*.so", "*.dylib"
+    rename "^libjktls", "libjktls-${targetArch()}-${targetOs()}"
+    into new File(project.buildDir, "native")
+}
+
+processResources {
+    dependsOn "copyNativeLib"
+    from(new File(project.buildDir, "native")) {
+        include "libjktls*"
+    }
+}
+
+dependencies {
+    testImplementation project(":testing")
+}

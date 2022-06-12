@@ -29,6 +29,7 @@ subprojects {
 
     ext {
         lombokVersion = '1.18.22'
+        junitVersion = '4.13.2'
         isReleaseVersion = !version.endsWith('-SNAPSHOT')
     }
 
@@ -37,7 +38,7 @@ subprojects {
         annotationProcessor "org.projectlombok:lombok:$lombokVersion"
         testCompileOnly "org.projectlombok:lombok:$lombokVersion"
         testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
-        testImplementation "junit:junit:4.13.2"
+        testImplementation "junit:junit:$junitVersion"
         testImplementation "org.assertj:assertj-core:3.21.0"
     }
 

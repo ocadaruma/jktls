@@ -29,6 +29,7 @@ import com.mayreh.jktls.KTlsSocketOptions;
 import com.mayreh.jktls.TlsCryptoInfo;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +45,8 @@ public class KTlsServer extends Thread implements AutoCloseable {
     }
 
     private final String[] enabledCipherSuites;
+    @Getter
+    private final int port;
     private final ExecutorService taskExecutor;
     private final SSLContext sslContext;
     private final Selector selector;
@@ -74,6 +77,7 @@ public class KTlsServer extends Thread implements AutoCloseable {
             serverSocketChannel = ServerSocketChannel.open();
             serverSocketChannel.configureBlocking(false);
             serverSocketChannel.socket().bind(new InetSocketAddress("0.0.0.0", port));
+            this.port = serverSocketChannel.socket().getLocalPort();
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

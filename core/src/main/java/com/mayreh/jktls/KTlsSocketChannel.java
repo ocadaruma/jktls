@@ -28,7 +28,7 @@ public class KTlsSocketChannel implements ByteChannel,
                                           GatheringByteChannel,
                                           NetworkChannel {
     static {
-        System.load(System.getenv("JKTLS_LIB_PATH"));
+        NativeLoader.load();
     }
 
     private static native void setTcpUlp(int fd, String name);

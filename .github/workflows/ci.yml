@@ -8,11 +8,12 @@ on:
     - master
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        java: [8, 11, 17]
+        java: [8, 11]
+        os: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v2
     - name: modprobe tls
@@ -25,3 +26,13 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
         arguments: build check
+  native-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Execute test
+      run: cargo test

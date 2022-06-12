@@ -3,6 +3,10 @@ package com.mayreh.jktls;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,8 +34,16 @@ public class KTlsTest {
         assertEquals("hello", rule.getClient().sendAndWaitReply("hello"));
     }
 
-//    @Test(timeout = 30000L)
-//    public void testSendfile() {
-//
-//    }
+    @Test(timeout = 15000L)
+    public void testSendfile() throws Exception {
+        Path file = folder.newFile().toPath();
+        Files.write(file, "sendfile!!\n".getBytes(StandardCharsets.UTF_8));
+        try (FileChannel fileChannel = FileChannel.open(file)) {
+            rule.setHandler((channel, message) -> {
+                channel.transferFrom(fileChannel, 0, fileChannel.size());
+            });
+
+            assertEquals("sendfile!!", rule.getClient().sendAndWaitReply("hello"));
+        }
+    }
 }

@@ -14,7 +14,9 @@ public class KTlsTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     @Rule
-    public KTlsServerClientRule rule = new KTlsServerClientRule();
+    public KTlsServerClientRule rule = new KTlsServerClientRule(new String[] {
+            "TLS_RSA_WITH_AES_128_GCM_SHA256"
+    });
 
     @Test(timeout = 15000L)
     public void testEcho() {

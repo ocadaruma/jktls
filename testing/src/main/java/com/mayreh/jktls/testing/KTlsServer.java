@@ -121,6 +121,7 @@ public class KTlsServer extends Thread implements AutoCloseable {
         if (connection != null) {
             connection.channel.setOption(KTlsSocketOptions.TCP_ULP, "tls");
             connection.channel.setOption(KTlsSocketOptions.TLS_TX, TlsCryptoInfo.from(engine));
+            socketChannel.register(selector, SelectionKey.OP_READ, connection);
         } else {
             log.warn("Closing the channel due to handshake failure");
             socketChannel.close();

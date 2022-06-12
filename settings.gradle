@@ -1,0 +1,4 @@
+rootProject.name = "jktls"
+include ":core"
+include ":demo"
+include ":testing"

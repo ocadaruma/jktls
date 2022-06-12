@@ -14,7 +14,7 @@ const SOL_TLS: c_int = 282;
 const TCP_ULP: c_int = 31;
 const TLS_TX: c_int = 1;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 enum KTlsError {
     Socket { msg: String },
     UnsupportedOperation { msg: String },
@@ -22,19 +22,19 @@ enum KTlsError {
 }
 
 #[repr(u16)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum TlsVersion {
     Tls12 = 0x0303,
 }
 
 #[repr(u16)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum CipherType {
     AesGcm128 = 51,
 }
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 struct TlsCryptoInfo {
     version: TlsVersion,
     cipher_type: CipherType,
@@ -58,14 +58,46 @@ impl TlsCryptoInfo {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug)]
-struct Tls12CryptoInfoAesGcm128 {
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+struct TlsCryptVectors<const I: usize, const K: usize, const S: usize, const R: usize> {
     info: TlsCryptoInfo,
-    iv: [u8; 8],
-    key: [u8; 16],
-    salt: [u8; 4],
-    rec_seq: [u8; 8],
+    iv: [u8; I],
+    key: [u8; K],
+    salt: [u8; S],
+    rec_seq: [u8; R],
 }
+
+impl<const I: usize, const K: usize, const S: usize, const R: usize> TlsCryptVectors<I, K, S, R> {
+    fn new(
+        info: TlsCryptoInfo,
+        iv: Vec<u8>,
+        key: Vec<u8>,
+        salt: Vec<u8>,
+        rec_seq: Vec<u8>,
+    ) -> Result<Self, KTlsError> {
+        let iv = iv.try_into().map_err(|_| KTlsError::IllegalArgument {
+            msg: "invalid iv".to_string(),
+        })?;
+        let key = key.try_into().map_err(|_| KTlsError::IllegalArgument {
+            msg: "invalid key".to_string(),
+        })?;
+        let salt = salt.try_into().map_err(|_| KTlsError::IllegalArgument {
+            msg: "invalid salt".to_string(),
+        })?;
+        let rec_seq = rec_seq.try_into().map_err(|_| KTlsError::IllegalArgument {
+            msg: "invalid rec_seq".to_string(),
+        })?;
+        Ok(Self {
+            info,
+            iv,
+            key,
+            salt,
+            rec_seq,
+        })
+    }
+}
+
+type Tls12AesGcm128 = TlsCryptVectors<8, 16, 4, 8>;
 
 fn expect_string(env: &JNIEnv, obj: JString) -> String {
     env.get_string(obj).expect("Failed to get JavaStr").into()
@@ -78,7 +110,6 @@ fn expect_byte_array(env: &JNIEnv, obj: jbyteArray) -> Vec<u8> {
 
 fn maybe_throw<T>(env: JNIEnv, res: &Result<T, KTlsError>) {
     if let Err(e) = res {
-        println!("Error !! : {:?}", e);
         let (class, msg) = match e {
             KTlsError::Socket { msg } => (SOCKET_EXCEPTION_CLASS, msg),
             KTlsError::UnsupportedOperation { msg } => (UNSUPPORTED_OPERATION_EXCEPTION_CLASS, msg),
@@ -149,40 +180,23 @@ fn set_tls_tx(
     let info = TlsCryptoInfo::new(&protocol, &cipher_suite)?;
     let [iv, key, salt, rec_seq] = [iv, key, salt, rec_seq].map(|a| expect_byte_array(&env, a));
 
-    let ret = match info {
+    let (ptr, len) = match info {
         TlsCryptoInfo {
             version: TlsVersion::Tls12,
             cipher_type: CipherType::AesGcm128,
         } => {
-            let crypt_info = Tls12CryptoInfoAesGcm128 {
-                info,
-                iv: iv.try_into().map_err(|_| KTlsError::IllegalArgument {
-                    msg: "invalid iv".to_string(),
-                })?,
-                key: key.try_into().map_err(|_| KTlsError::IllegalArgument {
-                    msg: "invalid key".to_string(),
-                })?,
-                salt: salt.try_into().map_err(|_| KTlsError::IllegalArgument {
-                    msg: "invalid salt".to_string(),
-                })?,
-                rec_seq: rec_seq.try_into().map_err(|_| KTlsError::IllegalArgument {
-                    msg: "invalid rec_seq".to_string(),
-                })?,
-            };
-            unsafe {
-                setsockopt(
-                    fd,
-                    SOL_TLS,
-                    TLS_TX,
-                    (&crypt_info) as *const Tls12CryptoInfoAesGcm128 as *const c_void,
-                    size_of::<Tls12CryptoInfoAesGcm128>() as u32,
-                )
-            }
+            let v = Tls12AesGcm128::new(info, iv, key, salt, rec_seq)?;
+            (
+                &v as *const Tls12AesGcm128 as *const c_void,
+                size_of::<Tls12AesGcm128>() as u32,
+            )
         }
     };
-    Errno::result(ret).map(drop).map_err(|e| KTlsError::Socket {
-        msg: format!("Failed to set TLS_TX: {}", e),
-    })
+    Errno::result(unsafe { setsockopt(fd, SOL_TLS, TLS_TX, ptr, len) })
+        .map(drop)
+        .map_err(|e| KTlsError::Socket {
+            msg: format!("Failed to set TLS_TX: {}", e),
+        })
 }
 
 #[no_mangle]
@@ -199,7 +213,7 @@ pub extern "system" fn Java_com_mayreh_jktls_KTlsSocketChannel_sendFile(
     res.unwrap_or(-1)
 }
 
-#[allow(unused_variables)]
+#[allow(unused_variables, unused_mut)]
 fn send_file(
     env: JNIEnv,
     out_fd: jint,
@@ -223,9 +237,46 @@ fn send_file(
 
 #[cfg(test)]
 mod tests {
+    use crate::{CipherType, Tls12AesGcm128, TlsCryptoInfo, TlsVersion};
+
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn new_crypt_info_success() {
+        assert_eq!(
+            TlsCryptoInfo::new("TLSv1.2", "TLS_RSA_WITH_AES_128_GCM_SHA256"),
+            Ok(TlsCryptoInfo {
+                version: TlsVersion::Tls12,
+                cipher_type: CipherType::AesGcm128,
+            })
+        )
+    }
+
+    #[test]
+    fn new_crypt_info_invalid() {
+        assert!(TlsCryptoInfo::new("foo", "bar").is_err());
+    }
+
+    #[test]
+    fn new_crypt_vectors_tls12_aes_gcm_128() {
+        let info = TlsCryptoInfo::new("TLSv1.2", "TLS_RSA_WITH_AES_128_GCM_SHA256").unwrap();
+        let iv = vec![0; 8];
+        let key = vec![0; 16];
+        let salt = vec![0; 4];
+        let rec_seq = vec![0; 8];
+        assert_eq!(
+            Tls12AesGcm128::new(info, iv, key, salt, rec_seq),
+            Ok(Tls12AesGcm128 {
+                info,
+                iv: [0; 8],
+                key: [0; 16],
+                salt: [0; 4],
+                rec_seq: [0; 8]
+            })
+        )
+    }
+
+    #[test]
+    fn new_crypt_vectors_tls12_aes_gcm_128_invalid() {
+        let info = TlsCryptoInfo::new("TLSv1.2", "TLS_RSA_WITH_AES_128_GCM_SHA256").unwrap();
+        assert!(Tls12AesGcm128::new(info, vec![], vec![], vec![], vec![]).is_err())
     }
 }

@@ -35,4 +35,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Execute test
+      working-directory: ./native
       run: cargo test

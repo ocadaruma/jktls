@@ -52,7 +52,7 @@ jobs:
         java-version: 1.8
     - name: Build native lib
       working-directory: ./core
-      run: ../gradlew build copyNativeLib
+      run: ../gradlew copyNativeLib
     - name: Save native lib output
       if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v2

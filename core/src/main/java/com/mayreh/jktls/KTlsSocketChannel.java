@@ -17,7 +17,6 @@ import com.mayreh.jktls.sun.nio.ch.SocketChannelImpl;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import sun.nio.ch.IOUtil;
 
 /**
  * A wrapper around {@link SocketChannel} with some tweaks to utilize kernel TLS.
@@ -49,8 +48,8 @@ public class KTlsSocketChannel implements ByteChannel,
     public long transferFrom(FileChannel channel, long position, long count) {
         if (FileChannelImpl.isInstance(channel)) {
             FileChannelImpl fileChannel = new FileChannelImpl(channel);
-            return sendFile(IOUtil.fdVal(impl.getFD()),
-                            IOUtil.fdVal(fileChannel.fd()),
+            return sendFile(FDUtil.fdVal(impl.getFD()),
+                            FDUtil.fdVal(fileChannel.fd()),
                             position,
                             count);
         }
@@ -81,12 +80,12 @@ public class KTlsSocketChannel implements ByteChannel,
     @Override
     public <T> KTlsSocketChannel setOption(SocketOption<T> name, T value) throws IOException {
         if (name == KTlsSocketOptions.TCP_ULP) {
-            setTcpUlp(IOUtil.fdVal(impl.getFD()), (String) value);
+            setTcpUlp(FDUtil.fdVal(impl.getFD()), (String) value);
             return this;
         }
         if (name == KTlsSocketOptions.TLS_TX) {
             TlsCryptoInfo info = (TlsCryptoInfo) value;
-            setTlsTx(IOUtil.fdVal(impl.getFD()),
+            setTlsTx(FDUtil.fdVal(impl.getFD()),
                      info.protocol(),
                      info.cipherSuite(),
                      info.iv(),

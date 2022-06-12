@@ -11,9 +11,10 @@ cd $(dirname $0)
 cd core
 ../gradlew -Pversion=$version -Psnapshot=false clean universalJar
 
-filename="jktls-${version}-universal.jar"
+assetname="jktls-${version}-universal.jar"
+filename="core-${version}-universal.jar"
 
-curl --fail -L "https://github.com/ocadaruma/jktls/releases/download/v${version}/${filename}" -o "build/libs/$filename"
+curl --fail -L "https://github.com/ocadaruma/jktls/releases/download/v${version}/${assetname}" -o "build/libs/$filename"
 echo -n "MD5 $filename: "
 md5sum < "build/libs/$filename"
 

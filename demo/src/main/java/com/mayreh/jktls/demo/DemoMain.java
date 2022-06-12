@@ -25,7 +25,7 @@ public class DemoMain {
         }
 
         FileChannel fileChannel = FileChannel.open(file);
-        KTlsServer tlsServer = new KTlsServer(port);
+        KTlsServer tlsServer = new KTlsServer(port, new String[]{"TLS_RSA_WITH_AES_128_GCM_SHA256"});
         tlsServer.setHandler((channel, m) -> {
             String message = new String(m, StandardCharsets.UTF_8).trim();
             log.info("Received: {}", message);

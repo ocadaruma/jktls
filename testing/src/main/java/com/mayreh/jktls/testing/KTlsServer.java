@@ -43,6 +43,7 @@ public class KTlsServer extends Thread implements AutoCloseable {
         void handleIncomingMessage(KTlsSocketChannel channel, byte[] message) throws IOException;
     }
 
+    private final String[] enabledCipherSuites;
     private final ExecutorService taskExecutor;
     private final SSLContext sslContext;
     private final Selector selector;
@@ -54,6 +55,11 @@ public class KTlsServer extends Thread implements AutoCloseable {
     private volatile boolean running;
 
     public KTlsServer(int port) {
+        this(port, null);
+    }
+
+    public KTlsServer(int port, String[] enabledCipherSuites) {
+        this.enabledCipherSuites = enabledCipherSuites;
         taskExecutor = Executors.newSingleThreadExecutor(r -> {
             Thread t = new Thread(r);
             t.setName("ssl-task-executor");
@@ -107,6 +113,9 @@ public class KTlsServer extends Thread implements AutoCloseable {
         SocketChannel socketChannel = serverSocketChannel.accept();
         socketChannel.configureBlocking(false);
         SSLEngine engine = sslContext.createSSLEngine();
+        if (enabledCipherSuites != null) {
+            engine.setEnabledCipherSuites(enabledCipherSuites);
+        }
 
         Connection connection = doHandshake(socketChannel, engine);
         if (connection != null) {

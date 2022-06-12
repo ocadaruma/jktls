@@ -208,7 +208,7 @@ fn send_file(
     count: jlong,
 ) -> Result<jlong, KTlsError> {
     #[cfg(target_os = "linux")]
-    let res = nix::sys::sendfile::sendfile64(out_fd, in_fd, Some(&mut position), count)
+    let res = nix::sys::sendfile::sendfile64(out_fd, in_fd, Some(&mut position), count as usize)
         .map(|c| c as jlong)
         .map_err(|e| KTlsError::Socket {
             msg: format!("Failed to sendfile: {}", e),

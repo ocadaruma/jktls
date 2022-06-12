@@ -204,7 +204,7 @@ fn send_file(
     env: JNIEnv,
     out_fd: jint,
     in_fd: jint,
-    position: jlong,
+    mut position: jlong,
     count: jlong,
 ) -> Result<jlong, KTlsError> {
     #[cfg(target_os = "linux")]

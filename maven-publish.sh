@@ -9,7 +9,7 @@ fi
 
 cd $(dirname $0)
 cd core
-../gradlew clean universalJar
+../gradlew -Pversion=$version -Psnapshot=false clean universalJar
 
 filename="jktls-${version}-universal.jar"
 
@@ -17,4 +17,4 @@ curl --fail -L "https://github.com/ocadaruma/jktls/releases/download/v${version}
 echo -n "MD5 $filename: "
 md5sum < "build/libs/$filename"
 
-../gradlew -x universalJar publish
+../gradlew -Pversion=$version -Psnapshot=false -x universalJar publish

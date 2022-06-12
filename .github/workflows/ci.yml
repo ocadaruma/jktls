@@ -74,9 +74,13 @@ jobs:
       with:
         name: native-libs
         path: core/build/native
+    - id: get-tag-version
+      run: |
+        version=$(echo ${{github.ref}} | cut -f3 -d/ | sed 's/^v//')
+        echo "::set-output name=version::$version"
     - name: Build universal jar
       working-directory: ./core
-      run: ../gradlew universalJar
+      run: ../gradlew -Pversion=${{ steps.get-tag-version.outputs.version }} -Psnapshot=false universalJar
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
@@ -85,10 +89,6 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
-    - id: get-tag-version
-      run: |
-        version=$(echo ${{github.ref}} | cut -f3 -d/ | sed 's/^v//')
-        echo "::set-output name=version::$version"
     - name: Upload release asset
       uses: actions/upload-release-asset@v1
       env:

@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Mirror of {@link sun.security.ssl.TransportContext} for exposure
+ * Mirror of `sun.security.ssl.TransportContext` for exposure
  */
 @RequiredArgsConstructor
 public class TransportContext {

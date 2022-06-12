@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Mirror of {@link sun.nio.ch.FileChannelImpl} for exposure
+ * Mirror of `sun.nio.ch.FileChannelImpl` for exposure
  */
 @RequiredArgsConstructor
 public class FileChannelImpl {

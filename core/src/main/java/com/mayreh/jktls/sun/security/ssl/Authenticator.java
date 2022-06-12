@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Mirror of {@link sun.security.ssl.Authenticator} for exposure
+ * Mirror of `sun.security.ssl.Authenticator` for exposure
  */
 @RequiredArgsConstructor
 public class Authenticator {

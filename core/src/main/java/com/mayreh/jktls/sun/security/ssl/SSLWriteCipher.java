@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 /**
- * Mirror of {@link sun.security.ssl.SSLCipher$SSLWriteCipher} for exposure
+ * Mirror of `sun.security.ssl.SSLCipher$SSLWriteCipher` for exposure
  */
 @RequiredArgsConstructor
 public class SSLWriteCipher {

@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Mirror of {@link sun.security.ssl.SSLEngineImpl} for exposure
+ * Mirror of `sun.security.ssl.SSLEngineImpl` for exposure
  */
 @RequiredArgsConstructor
 public class SSLEngineImpl {

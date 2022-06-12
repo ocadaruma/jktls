@@ -1,4 +1,10 @@
 apply plugin: "java-library"
+apply plugin: "maven-publish"
+apply plugin: "signing"
+
+dependencies {
+    testImplementation project(":testing")
+}
 
 static def targetOs() {
     def os = System.getProperty("os.name").toLowerCase()
@@ -36,6 +42,68 @@ processResources {
     }
 }
 
-dependencies {
-    testImplementation project(":testing")
+task universalJar(type: Jar) {
+    dependsOn "jar"
+    archiveClassifier.set("universal")
+    from(zipTree(jar.outputs.files.singleFile)) {
+        exclude "libjktls*"
+    }
+    from new File(project.buildDir, "native")
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    repositories {
+        maven {
+            if (isReleaseVersion) {
+                url("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            } else {
+                url("https://oss.sonatype.org/content/repositories/snapshots/")
+            }
+            credentials {
+                username findProperty("sonatypeUsername")
+                password findProperty("sonatypePassword")
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "jktls"
+            artifact source: universalJar, classifier: null
+            artifact javadocJar
+            artifact sourcesJar
+
+            pom {
+                name = 'jktls'
+                description = 'Kernel TLS on Java'
+                url = 'https://github.com/ocadaruma/jktls'
+                scm {
+                    connection = 'scm:git:git@github.com:ocadaruma/jktls.git'
+                    url = 'git@github.com:ocadaruma/jktls.git'
+                }
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://raw.githubusercontent.com/ocadaruma/jktls/master/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'ocadaruma'
+                        name = 'Haruki Okada'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
+    sign publishing.publications.mavenJava
 }

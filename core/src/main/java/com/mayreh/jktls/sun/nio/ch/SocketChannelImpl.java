@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Mirror of {@link sun.nio.ch.SocketChannelImpl} for exposure
+ * Mirror of `sun.nio.ch.SocketChannelImpl` for exposure
  */
 @RequiredArgsConstructor
 public class SocketChannelImpl {

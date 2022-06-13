@@ -35,7 +35,8 @@ jobs:
     - name: Execute test
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: check
+        # exclude copyNativeLib task to prevent cleaning-up restored output
+        arguments: check -x copyNativeLib
   build-native:
     runs-on: ubuntu-latest
     steps:
@@ -89,7 +90,7 @@ jobs:
         echo "::set-output name=version::$version"
     - name: Build universal jar
       working-directory: ./jktls
-      run: ../gradlew -Pversion=${{ steps.get-tag-version.outputs.version }} -Psnapshot=false universalJar
+      run: ../gradlew -Pversion=${{ steps.get-tag-version.outputs.version }} -Psnapshot=false universalJar -x copyNativeLib
     - name: Create release
       id: create_release
       uses: actions/create-release@v1

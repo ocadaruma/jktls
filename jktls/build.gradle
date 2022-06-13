@@ -29,6 +29,9 @@ static def targetArch() {
 }
 
 task buildNativeLib(type: Exec) {
+    if (System.getenv("SKIP_NATIVE_BUILD") == "1") {
+        return
+    }
     workingDir "../native"
     def args = ["cargo", "build", "--release"]
     commandLine args

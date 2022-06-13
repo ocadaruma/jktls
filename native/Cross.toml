@@ -1,2 +1,2 @@
 [target.x86_64-unknown-linux-gnu]
-image = "ossystems/rust-cross:x86_64-linux-compat-0.2.1"
+image = "ocadarumarust-cross:x86_64-linux-compat-0.2.1"

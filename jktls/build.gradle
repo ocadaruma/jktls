@@ -53,9 +53,9 @@ task copyNativeLib(type: Copy) {
     dependsOn "buildNativeLib"
     def target = rustTarget()
     if (target != null) {
-        from "../native/target/release"
-    } else {
         from "../native/target/$target/release"
+    } else {
+        from "../native/target/release"
     }
     include "*.so", "*.dylib"
     rename "^libjktls", "libjktls-${targetArch()}-${targetOs()}"

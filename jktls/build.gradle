@@ -29,8 +29,8 @@ static def targetArch() {
 }
 
 task buildNativeLib(type: Exec) {
-    if (System.getenv("SKIP_NATIVE_BUILD") == "1") {
-        return
+    onlyIf {
+        System.getenv("SKIP_NATIVE_BUILD") != "1"
     }
     workingDir "../native"
     def args = ["cargo", "build", "--release"]
@@ -38,6 +38,9 @@ task buildNativeLib(type: Exec) {
 }
 
 task copyNativeLib(type: Copy) {
+    onlyIf {
+        System.getenv("SKIP_NATIVE_BUILD") != "1"
+    }
     dependsOn "buildNativeLib"
     from "../native/target/release"
     include "*.so", "*.dylib"

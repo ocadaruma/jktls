@@ -1,4 +1,7 @@
 name: CI
+env:
+  # Throughout the workflow, we build native build explicitly without using gradle task
+  SKIP_NATIVE_BUILD: 1
 on:
   push:
     branches:
@@ -31,8 +34,6 @@ jobs:
         path: jktls/build/native
     - name: Execute test
       uses: eskatos/gradle-command-action@v1
-      env:
-        SKIP_NATIVE_BUILD: 1
       with:
         arguments: build check
   build-native:
@@ -47,16 +48,14 @@ jobs:
       with:
         use-cross: true
         command: test
-        args: --manifest-path native/Cargo.toml --target
+        args: --manifest-path native/Cargo.toml --target x86_64-unknown-linux-gnu
     - uses: actions-rs/cargo@v1
       with:
         use-cross: true
         command: build
-        args: --manifest-path native/Cargo.toml --target  --release
+        args: --manifest-path native/Cargo.toml --target x86_64-unknown-linux-gnu --release
     - name: Copy native lib
       working-directory: ./jktls
-      env:
-        SKIP_NATIVE_BUILD: 1
       run: ../gradlew copyNativeLib
     - uses: actions/upload-artifact@v2
       with:
@@ -84,8 +83,6 @@ jobs:
         echo "::set-output name=version::$version"
     - name: Build universal jar
       working-directory: ./jktls
-      env:
-        SKIP_NATIVE_BUILD: 1
       run: ../gradlew -Pversion=${{ steps.get-tag-version.outputs.version }} -Psnapshot=false universalJar
     - name: Create release
       id: create_release

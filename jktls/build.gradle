@@ -38,9 +38,6 @@ task buildNativeLib(type: Exec) {
 }
 
 task copyNativeLib(type: Copy) {
-    onlyIf {
-        System.getenv("SKIP_NATIVE_BUILD") != "1"
-    }
     dependsOn "buildNativeLib"
     from "../native/target/release"
     include "*.so", "*.dylib"

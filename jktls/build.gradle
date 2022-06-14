@@ -28,15 +28,35 @@ static def targetArch() {
     throw new RuntimeException("architecture not supported: " + System.getProperty("os.arch"))
 }
 
+static def rustTarget() {
+    System.getenv("RUST_TARGET")
+}
+
+static def skipNativeBuild() {
+    System.getenv("SKIP_NATIVE_BUILD") == "1"
+}
+
 task buildNativeLib(type: Exec) {
+    onlyIf {
+        !skipNativeBuild()
+    }
     workingDir "../native"
     def args = ["cargo", "build", "--release"]
+    def target = rustTarget()
+    if (target != null) {
+        args += ["--target", target]
+    }
     commandLine args
 }
 
 task copyNativeLib(type: Copy) {
     dependsOn "buildNativeLib"
-    from "../native/target/release"
+    def target = rustTarget()
+    if (target != null) {
+        from "../native/target/$target/release"
+    } else {
+        from "../native/target/release"
+    }
     include "*.so", "*.dylib"
     rename "^libjktls", "libjktls-${targetArch()}-${targetOs()}"
     into new File(project.buildDir, "native")

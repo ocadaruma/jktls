@@ -1,2 +1,2 @@
 [target.x86_64-unknown-linux-gnu]
-image = "ossystems/rust-cross:x86_64-linux-compat-0.2.1"
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-gnu:main@sha256:aaf4e0437a5918ed92efb1df5b944373eccc7912cb62e1fa152a625959ba4ca9"

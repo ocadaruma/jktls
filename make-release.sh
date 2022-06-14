@@ -17,7 +17,7 @@ if [ $(git tag | grep "^v$version\$" | wc -l) -ne 0 ]; then
     exit 1
 fi
 
-sed -i "" -e "s/^version=.*$/version=$version/" ../gradle.properties
+sed -i "" -e "s/^version=.*$/version=$version/" ./gradle.properties
 
 git add gradle.properties
 git commit -m "Release $version"

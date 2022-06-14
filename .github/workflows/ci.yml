@@ -47,6 +47,8 @@ jobs:
     # Use cross to build against old glibc
     - uses: actions-rs/cargo@v1
       with:
+        # We found that auto-installed cross version (by use-cross: true) doesn't lookup
+        # Cross.toml correctly somehow. (the version is outdated? need further check).
         command: install
         args: cross --git https://github.com/cross-rs/cross
     - uses: actions-rs/cargo@v1

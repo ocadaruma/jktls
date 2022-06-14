@@ -44,14 +44,12 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
     # Use cross to build against old glibc
     - uses: actions-rs/cargo@v1
-      env:
-        CROSS_TARGET_X86_64_UNKNOWN_LINUX_GNU_IMAGE: "ocadarumarust-cross:x86_64-linux-compat-0.2.1"
+      with:
+        command: install
+        args: cross --git https://github.com/cross-rs/cross
+    - uses: actions-rs/cargo@v1
       with:
         use-cross: true
         command: test

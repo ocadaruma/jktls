@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export SKIP_NATIVE_BUILD=1
+
 version="$1"
 if [ -z "$version" ]; then
     echo "Usage: $0 VERSION" >&2
